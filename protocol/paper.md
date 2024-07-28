@@ -1,16 +1,37 @@
 # Network architecture
 
-The goal of the protocol is to provide a general way to resolve addresses (domain names or IP) of decentralized network clients by their public asymmetrical encryption keys. Protocol provides basic instruments to connect to the network, lookup clients, send and receive messages through it.
+The goal of the protocol is to provide a general way to
+resolve addresses (domain names or IP) of decentralized
+network clients by their public asymmetrical encryption keys.
+Protocol provides basic instruments to connect to the network,
+lookup clients, send and receive messages through it.
 
-The key concept of the library is providing a decentralized DNS table and allowing different applications and computers to reuse the same endpoint (service) to search through the network and send/receive messages.
+The key concept of the library is providing a decentralized DNS table
+and allowing different applications and computers to reuse the same
+endpoint (service) to search through the network and send/receive messages.
 
-This is achieved by providing two types of clients: a `Client` and a `Server`. Clients are, essentially, HTTP clients + secret key holders. They are making special HTTP requests to the servers to communicate with and through the network. Servers are HTTP servers, holding information about local/remote clients, remote servers and state of the network. This allows us to reuse one local server service on computer by different applications, or to use globally available servers if client can't expose its local server to the network.
+This is achieved by providing two types of clients: a `Client`
+and a `Server`. Clients are, essentially, HTTP clients + secret key holders.
+They are making special HTTP requests to the servers to communicate
+with and through the network. Servers are HTTP servers, holding information
+about local/remote clients, remote servers and state of the network.
+This allows us to reuse one local server service on computer by different
+applications, or to use globally available servers if client can't
+expose its local server to the network.
 
 <img src="./network-structure.png">
 
-Here you can see two segments of the global network. Segment is a group of servers which can reach each other directly or through other servers. Potentially, these servers, depending on their configuration and implementation, will eventually find each other. Clients in this network can reach each other using `/api/v1/lookup` calls which will return local server's clients or give hint which will point to other servers which can be used to repeat this process.
+Here you can see two segments of the global network.
+Segment is a group of servers which can reach each other
+directly or through other servers. Potentially, these servers,
+depending on their configuration and implementation,
+will eventually find each other. Clients in this network
+can reach each other using `/api/v1/lookup` calls which will return
+local server's clients or give hint which will point to
+other servers which can be used to repeat this process.
 
-Clients in different network segments can't lookup each other. To resolve this issue they need to be connected to the servers within the same segment.
+Clients in different network segments can't lookup each other.
+To resolve this issue they need to be connected to the servers within the same segment.
 
 # Servers REST API
 
@@ -89,7 +110,9 @@ type Response<T> = ResponseError | ResponseSuccess<T>;
 
 ## `GET /api/v1/info`
 
-Get basic information about the server. Needed for initial `connect` request to get the server's public key. Other fields can help clients to determine whether they should connect to this server.
+Get basic information about the server. Needed for initial `connect` request
+to get the server's public key. Other fields can help clients to determine
+whether they should connect to this server.
 
 ```ts
 type InfoResponse = {
@@ -135,7 +158,8 @@ type InfoResponse = {
 
 ## `GET /api/v1/clients`
 
-Get list of clients connected to the server. This method is mostly needed for other servers to dynamically construct the routing table.
+Get list of clients connected to the server. This method is mostly needed
+for other servers to dynamically construct the routing table.
 
 ```ts
 // `ConnectionCertificate` and `ClientInfo` are defined later
@@ -160,7 +184,8 @@ type ClientsResponse = {
 
 ## `GET /api/v1/servers`
 
-Get list of other servers known to the current one which implement this protocol. This method is mostly needed for other servers to dynamically construct the routing table.
+Get list of other servers known to the current one which implement this protocol.
+This method is mostly needed for other servers to dynamically construct the routing table.
 
 ```ts
 type Server = {
@@ -187,27 +212,47 @@ Establish connection with remote server.
 
 Connection token structure:
 
-1. `auth_date` - UTC timestamp when the client performed the connection requet. It must be a uint64 number with Big Endian encoding.
+1. `auth_date`  - UTC timestamp when the client performed the connection requet.
+                  It must be a uint64 number with Big Endian encoding.
 2. `public_key` - 33 bytes of the server's public key.
 
-Certificate should proof that the client is connected to the current server. If eventually client will connect to another server - this server will have a new certificate with higher `auth_date` value, so he will be prioritized and the old server will be replaced by the new one in the routing table.
+Certificate should proof that the client is connected to the current server.
+If eventually client will connect to another server - this server will have
+a new certificate with higher `auth_date` value, so he will be prioritized
+and the old server will be replaced by the new one in the routing table.
 
-It is possible for client to name a wrong `auth_date`. This means, however, that the server with this faked certificate can keep the authority over the client for a long time so the client will not be able to use the network properly. It's in the client's interests to create correct `auth_date` timestamps.
+It is possible for client to name a wrong `auth_date`. This means, however,
+that the server with this faked certificate can keep the authority over the client
+for a long time so the client will not be able to use the network properly.
+It's in the client's interests to create correct `auth_date` timestamps.
 
 Example connection token:
 
 ```
-[0, 0, 0, 0, 102, 27, 141, 184, 2, 191, 43, 127, 14, 209, 119, 11, 168, 125, 39, 150, 247, 184, 33, 101, 224, 62, 201, 165, 78, 232, 105, 89, 52, 65, 215, 117, 117, 233, 111, 225, 182]
+[
+    0,   0,   0,   0,   102, 27,  141, 184, 2,   191,
+    43,  127, 14,  209, 119, 11,  168, 125, 39,  150,
+    247, 184, 33,  101, 224, 62,  201, 165, 78,  232,
+    105, 89,  52,  65,  215, 117, 117, 233, 111, 225,
+    182
+]
 ```
 
 ### Client type
 
-- `thin` - this client is connected to the server and polls messages from its inbox. It doesn't have any other way of communication.
-- `thick` - this client uses its server to announce the network about its existance and to lookup other clients in this network. It accepts direct requests to the announced address.
-- `server` - this client can work as the network server. It's needed to allow people with static IP addresses to serve the content over the network without traditional DNS.
-- `file` - this is a virtual client needed to host dynamic URIs to the files.
+- `thin`   - this client is connected to the server and polls messages
+             from its inbox. It doesn't have any other way of communication.
+- `thick`  - this client uses its server to announce the network about
+             its existance and to lookup other clients in this network.
+             It accepts direct requests to the announced address.
+- `server` - this client can work as the network server. It's needed
+             to allow people with static IP addresses to serve the content
+             over the network without traditional DNS.
+- `file`   - this is a virtual client needed to host dynamic URIs to the files.
 
-> The difference between `thick` and `server` client types is that the `thick` client implements arbitrary protocol while `server` promises that the protocol it implements is compatible with the current standard.
+> The difference between `thick` and `server` client types is that
+> the `thick` client implements arbitrary protocol while `server`
+> promises that the protocol it implements is compatible with the current standard.
 
 ```ts
 type ThinClient = {
@@ -267,15 +312,33 @@ type ConnectRequest = Request<{
 type ConnectResponse = Response<void>;
 ```
 
+## `POST /api/v1/disconnect`
+
+Disconnect from the server.
+
+This is an optional request type which can be used to announce your server
+that you are planning to disconnect from it. You're still able to perform
+requests to this server but depending on its implementation your requests
+could be blocked until you perform a new `connect` request.
+
+### Types
+
+```ts
+type DisconnectRequest = Request<void>;
+type DisconnectResponse = Response<void>;
+```
+
 ## `POST /api/v1/lookup`
 
 Lookup client with given public key in the network.
 
 ### Response types
 
-- `local` - given client is connected to the current server.
+- `local`  - given client is connected to the current server.
 - `remote` - given client is connected to another server.
-- `hint` - there's no records about this client saved in the current server. Instead we're giving a hint - list of another servers which we could ask to find the needed client.
+- `hint`   - there's no records about this client saved in the current server.
+             Instead we're giving a hint - list of another servers which we
+             could ask to find the needed client.
 
 ### Types
 
@@ -334,9 +397,13 @@ type LookupResponse = Response<LookupResponseLocal | LookupResponseRemote | Look
 
 Announce a client-server pair or just a server to another server.
 
-It is expected that a client or a server will run this request over its known remote servers if the server can be accessed globally through the Internet.
+It is expected that a client or a server will run this request
+over its known remote servers if the server can be accessed
+globally through the Internet.
 
-If this method is not called, then (depending on implementation) other servers will not be aware of you, and would not be able to perform lookup requests on your server's local clients.
+If this method is not called, then (depending on implementation)
+other servers will not be aware of you, and would not be able
+to perform lookup requests on your server's local clients.
 
 ### Types
 
@@ -401,7 +468,8 @@ Format: `<encoding>/<encryption>`.
 | `base64/aes256-gcm` | Base64-encoded value encrypted with [AES-256-GCM](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) |
 | `base64/chacha20-poly1305` | Base64-encoded value encrypted with [ChaCha20-Poly1305](https://en.wikipedia.org/wiki/ChaCha20-Poly1305) |
 
-> Note: ChaCha20-Poly1305 is a modern algorithm originated from the stream encryption algorithm ChaCha20. This makes it much faster than AES-256, even with hardware acceleration modules.
+> Note: ChaCha20-Poly1305 is a modern algorithm originated from the stream encryption algorithm ChaCha20.
+> This makes it much faster than AES-256, even with hardware acceleration modules.
 
 #### With compression and encryption
 
@@ -420,7 +488,8 @@ Operations order:
 2. Encryption (if presented)
 3. Encoding
 
-> Encryption and digital signatures generators must use pre-defined nonces. Refer to the standard implementation for details.
+> Encryption and digital signatures generators must use pre-defined nonces.
+> Refer to the standard implementation for details.
 
 ### Types
 
