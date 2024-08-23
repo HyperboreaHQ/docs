@@ -32,6 +32,8 @@ or when M transactions were received - it purely depends on the application whic
 Blocks can be indexed by numbers instead of hashes because they're fewere than transactions.
 In fact, transactions were made as well to allow blocks to have numbers.
 
+<img src="./blockchain.png">
+
 ## Hyperchain shards (mesh network)
 
 To synchronize the state of the blockchain clients form a mesh network of "shards".
@@ -52,6 +54,8 @@ communications protocol. Instead, they need to start a hyperborea client and use
 to subscribe to some of the other known clients which are online. Thanks to the shards architecture
 you will become a part of the global communications network without any additional steps.
 This is a really powerful mechanism which is highly recommended to use for your own applications.
+
+<img src="./shard.png">
 
 ## Transactions
 
