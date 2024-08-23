@@ -1,10 +1,15 @@
 # Hyperborea
 
-Hyperborea is a highly experimental decentralized network protocol. Its purpose is to provide basic interfaces to perform search of remote addresses of the clients using their assigned asymmetrical encryption public keys, and to perform basic communication between them.
+Hyperborea is a highly experimental decentralized network protocol. Its purpose is to provide
+basic interfaces to perform search of remote addresses of the clients using their assigned
+asymmetrical encryption public keys, and to perform basic communication between them.
 
 ## Useful links
 
-- [Protocol paper](./protocol/paper.md) - reference to the protocol's REST API and some explanations of design choices. This is a technical document needed for custom implementation writers.
+- [Protocol paper](./protocol/paper.md) - reference to the protocol's REST API and some explanations
+  of design choices. This is a technical document needed for custom implementation writers.
+- [Blockchain paper](./blockchain/paper.md) - reference to the standard PoA blockchain implementation -
+  [hyperchain](https://github.com/HyperboreaHQ/hyperchain).
 
 ## Related projects
 
@@ -23,6 +28,9 @@ Author: [Nikita Podvirnyi](https://github.com/krypt0nn)
 
 - Protocol as a standard, as well as its documentation is distributed under the [Unlicense](./LICENSE).
 
-- Standard implementation of the protocol ([hyperborealib](https://github.com/HyperboreaHQ/hyperborealib)), as well as all the other applications listed above, are licensed under AGPL-3.0 or GPL-3.0. Visit projects repositories for details.
+- Standard implementation of the protocol ([hyperborealib](https://github.com/HyperboreaHQ/hyperborealib)),
+  as well as all the other applications listed above, are licensed under AGPL-3.0 or GPL-3.0.
+  Visit projects repositories for details.
 
-This decision was made to allow everybody to create their own implementations of the same protocol to extend its accessibility and potential.
+This decision was made to allow everybody to create their own implementations of the same protocol
+to extend its accessibility and potential.
