@@ -238,9 +238,7 @@ type ShardMessage = {
 type ShardUpdate =
     | StatusUpdate
     | AnnounceBlocksUpdate
-    | AnnounceTransactionsUpdate
-    | AskBlocksUpdate
-    | AskTransactionsUpdate;
+    | AnnounceTransactionsUpdate;
 ```
 
 ## `StatusUpdate`
@@ -302,40 +300,5 @@ type AnnounceTransactionsUpdate = {
     format: 1,
     type: 'announce_transactions',
     transactions: Transaction[]
-};
-```
-
-## `AskBlocksUpdate`
-
-Ask shard member or owner to send blocks in given period.
-
-```ts
-type AskBlocksUpdate = {
-    format: 1,
-    type: 'ask_blocks',
-    body: {
-        // Number of the first asked block
-        from_number: number,
-
-        // Maximum amount of blocks to receive
-        // If null, then all the available ones
-        max_amount: number | null
-    }
-};
-```
-
-## `AskTransactionsUpdate`
-
-Ask shard member or owner to send transactions with given hashes.
-
-Hashes can be obtained from the `StatusUpdate` messages.
-
-```ts
-type AskBlocksUpdate = {
-    format: 1,
-    type: 'ask_transactions',
-
-    // List of base64 encoded hashes of asked transactions
-    hashes: string[]
 };
 ```
