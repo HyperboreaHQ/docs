@@ -237,6 +237,7 @@ type ShardMessage = {
 
 type ShardUpdate =
     | StatusUpdate
+    | AnnounceMembers
     | AnnounceBlocksUpdate
     | AnnounceTransactionsUpdate;
 ```
@@ -254,7 +255,7 @@ type StatusUpdate = {
         // Known blockchain blocks
         blocks: {
             // First known block, or null if none of blocks are known
-            root: Block | null,
+            head: Block | null,
 
             // Last known block, or null if none of blocks are known
             tail: Block | null
@@ -263,14 +264,23 @@ type StatusUpdate = {
         // List of base64 hashes of known staged transactions
         // Staged transactions are those which are not yet stored
         // in the blocks of blockchain
-        transactions: string[],
-
-        // Announced list of shards to which the current client is subscribed
-        subscriptions: ShardMember[],
-
-        // Announced list of shard members which are subscribed to the current client
-        subscribers: ShardMember[]
+        transactions: string[]
     }
+};
+```
+
+## `AnnounceMembers`
+
+Shard owners can send list of members which are subscribed to this shard. These messages
+can be used by other client to connect to these members, so indirectly connecting
+to this shard (forming a mesh network). This is an important message type which
+supports the decentralized network.
+
+```ts
+type AnnounceMembers = {
+    format: 1,
+    type: 'announce_members',
+    members: ShardMember[]
 };
 ```
 
